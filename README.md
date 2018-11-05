@@ -1,4 +1,4 @@
-#Homework 3 Solutions
+# Homework 3 Solutions
 
 This repository contains the solutions for Homework 5 for Data Science I (P8105).
 

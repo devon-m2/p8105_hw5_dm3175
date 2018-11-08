@@ -68,7 +68,11 @@ The next problem explores data gathered by the Washington Post on homicides in 5
 ```{r}
 url = "https://raw.githubusercontent.com/washingtonpost/data-homicides/master/homicide-data.csv"
 homicide_data = read_csv(url, na = "Unknown") %>% 
-  janitor::clean_names() %>% 
+  janitor::clean_names() 
+
+# Clean error in state "AL" to "OK" for Tul-000769
+clean_homicide_data = homicide_data %>% 
+  mutate(state = ifelse(uid == "Tul-000769", "OK", state)) %>% 
   mutate(city_state = str_c(city, ", ", state))
 
 ```
@@ -87,24 +91,36 @@ The dataset contains `r nrow(homicide_data)` observations and `r ncol(homicide_d
 *  `lat` and `lon` - latitude and longitude of homicide
 *  `disposition` - outcome of homicide with three options: "Closed by arest", "Closed without arrest", or "Open/No arrest"
 
+An error in the original data table listed "Tulsa, AL" as a location; however, the coordinates actually corresponded to "Tulsa, OK". Therefore, the state was fixed to Oklahoma in the clean dataset.  
+
 ## Homicides by City, State
 
-### Total Homicides
-The total number of homicides for each city, state is provided in the table below. Chicago, IL, Philadelphia, PA, and Houston, TX are the top three cities by total homicides. 
+### Total Homicides and Unsolved Homicides in All Cities
+The total number of homicides and unsolved homicides for each city, state is provided in the table below. 
 
 ```{r}
-homicide_data %>% 
+total_hom_count = clean_homicide_data %>% 
   group_by(city_state) %>% 
-  summarize(n = n()) %>%
-  arrange(desc(n)) %>% 
-  knitr::kable(digits = 1)
+  summarize(n_total_homicides = n())
 
+unsolved_hom_count = clean_homicide_data %>% 
+  filter(disposition == "Closed without arrest" | disposition == "Open/No arrest") %>% 
+  group_by(city_state) %>% 
+  summarize(n_unsolved_homicide = n())
+
+homicide_counts = full_join(total_hom_count, unsolved_hom_count, by = "city_state") %>% 
+  arrange(desc(n_total_homicides))
+
+homicide_counts %>% 
+  knitr::kable(digits = 1)
 ```
 
-### Unsolved Homicides
-The total number of unsolved homicides (those with disposition of “Closed without arrest” or “Open/No arrest”) are provided in the table below.
+Chicago, IL, Philadelphia, PA, and Houston, TX are the top three cities by total homicides. The table also presents the total number of unsolved homicides (those with disposition of “Closed without arrest” or “Open/No arrest”). Chicago, IL had the largest number of unsolved homicides with `r filter(homicide_counts, city_state == "Chicago, IL") %>% pull(n_unsolved_homicide)`. Baltimore, MD has the second largest number of unsolved homicides with `r filter(homicide_counts, city_state == "Baltimore, MD") %>% pull(n_unsolved_homicide)`. The city with the least unsolved homicides was Tampa, FL with `r filter(homicide_counts, city_state == "Tampa, FL") %>% pull(n_unsolved_homicide)`. Tulsa, AL had no unsolved homicides reported. 
+
+### Unsolved Homicides in Baltimore, MD
+
 
 ```{r}
-
+prop.test(x = 750, n = 2205, p = 0.30, alternative = "greater", conf.level = 0.95, correct = FALSE)
 ```
 

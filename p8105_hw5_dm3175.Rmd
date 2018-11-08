@@ -59,6 +59,52 @@ longit_tidy %>%
 
 ```
 
-
 # Problem 2
+
+## Load and Clean the Data
+
+The next problem explores data gathered by the Washington Post on homicides in 50 large US cities. Data was read in from a CSV posted on GitHub.
+
+```{r}
+url = "https://raw.githubusercontent.com/washingtonpost/data-homicides/master/homicide-data.csv"
+homicide_data = read_csv(url, na = "Unknown") %>% 
+  janitor::clean_names() %>% 
+  mutate(city_state = str_c(city, ", ", state))
+
+```
+
+The dataset contains `r nrow(homicide_data)` observations and `r ncol(homicide_data)` variables. A new variable `city_state` was created to concatenate the city and state variables. The variables in the dataset are: 
+
+*  `uid` - unique identifier
+*  `reported_date` - date homicide reported
+*  `victim_last` and `victim_first` - name of victim
+*  `victim_race` - race of victim
+*  `victim_age` - age of victim
+*  `victim_sex` - sex of victim
+*  `city` - city of homicide
+*  `state` - state of homicide
+*  `city_state` - combination city, state
+*  `lat` and `lon` - latitude and longitude of homicide
+*  `disposition` - outcome of homicide with three options: "Closed by arest", "Closed without arrest", or "Open/No arrest"
+
+## Homicides by City, State
+
+### Total Homicides
+The total number of homicides for each city, state is provided in the table below. Chicago, IL, Philadelphia, PA, and Houston, TX are the top three cities by total homicides. 
+
+```{r}
+homicide_data %>% 
+  group_by(city_state) %>% 
+  summarize(n = n()) %>%
+  arrange(desc(n)) %>% 
+  knitr::kable(digits = 1)
+
+```
+
+### Unsolved Homicides
+The total number of unsolved homicides (those with disposition of “Closed without arrest” or “Open/No arrest”) are provided in the table below.
+
+```{r}
+
+```
 

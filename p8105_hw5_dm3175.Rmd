@@ -15,18 +15,26 @@ library(purrr)
 
 ## Load and Clean Data
 
-First, the data from the longitudinal study was loaded and cleaned. The files were originally stored in separate csv files, but were loaded and combined into one dateframe using the `map` function. The `map` function iterates over the cells in the file name column and enters them into a new column in the data frame.  
+First, the data from the longitudinal study was loaded and cleaned. The files were originally stored in separate csv files, but were loaded and combined into one dateframe using the `map` function. The `map` function iterates over the cells in the file name column and enters them into a new column in the data frame.
 
-```{r}
+```{r message = FALSE}
+# Load list of file names into a data frame
 longit_file_names = tibble(files = list.files("./data"),
                            path = str_c("./data/", files)) %>% 
   janitor::clean_names() 
 
+# Iterate loading csvs from directory and tidy data
 longit_tidy = longit_file_names %>% 
   mutate(patient_data = map(path, read_csv)) %>% 
   unnest() %>% 
-  gather(key = week, value = obs, week_1:week_8)
-
+  gather(key = week, value = obs, week_1:week_8) %>% 
+  separate(files, into = c("group_arm", "subject_id"), sep = "_") %>% 
+  mutate(subject_id = str_replace(subject_id, ".csv", ""), 
+         week = str_replace(week, "week_", "")) %>% 
+  mutate(group_arm = factor(group_arm, levels = c("con", "exp")),
+         subject_id = as.double(subject_id), 
+         week = as.double(week)) %>% 
+  select(group_arm, subject_id, week, obs)
 
 ```
 

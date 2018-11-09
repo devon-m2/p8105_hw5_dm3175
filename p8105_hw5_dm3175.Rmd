@@ -106,7 +106,7 @@ An error in the original data table listed "Tulsa, AL" as a location for one obs
 ### Homicides by City, State
 
 #### Total Homicides and Unsolved Homicides in All Cities
-The total number of homicides and unsolved homicides for each city, state is provided in the table below. 
+The total number of homicides and unsolved homicides were summarized for each city, state in a dataframe `homicide_counts`. The `n_total_homicides` provides a count for total homicides, and `n_unsolved_homicide` a count for unsolved homicides (those with disposition of “Closed without arrest” or “Open/No arrest”). 
 
 ```{r}
 total_hom_count = clean_homicide_data %>% 
@@ -121,11 +121,9 @@ unsolved_hom_count = clean_homicide_data %>%
 homicide_counts = full_join(total_hom_count, unsolved_hom_count, by = "city_state") %>% 
   arrange(desc(n_total_homicides))
 
-homicide_counts %>% 
-  knitr::kable(digits = 1)
 ```
 
-Chicago, IL, Philadelphia, PA, and Houston, TX are the top three cities by total homicides. The table also presents the total number of unsolved homicides (those with disposition of “Closed without arrest” or “Open/No arrest”). Chicago, IL had the largest number of unsolved homicides with `r filter(homicide_counts, city_state == "Chicago, IL") %>% pull(n_unsolved_homicide)`. Baltimore, MD has the second largest number of unsolved homicides with `r filter(homicide_counts, city_state == "Baltimore, MD") %>% pull(n_unsolved_homicide)`. The city with the least unsolved homicides was Tampa, FL with `r filter(homicide_counts, city_state == "Tampa, FL") %>% pull(n_unsolved_homicide)`.
+Chicago, IL (`r filter(homicide_counts, city_state == "Chicago, IL") %>% pull(n_total_homicides)` homicides), Philadelphia, PA (`r filter(homicide_counts, city_state == "Philadelphia, PA") %>% pull(n_total_homicides)` homicides), and Houston, TX (`r filter(homicide_counts, city_state == "Houston, TX") %>% pull(n_total_homicides)` homicides) are the top three cities by total homicides. The table also presents the total number of unsolved homicides (those with disposition of “Closed without arrest” or “Open/No arrest”). Chicago, IL had the largest number of unsolved homicides with `r filter(homicide_counts, city_state == "Chicago, IL") %>% pull(n_unsolved_homicide)`. Baltimore, MD has the second largest number of unsolved homicides with `r filter(homicide_counts, city_state == "Baltimore, MD") %>% pull(n_unsolved_homicide)`. The city with the least unsolved homicides was Tampa, FL with `r filter(homicide_counts, city_state == "Tampa, FL") %>% pull(n_unsolved_homicide)`.
 
 #### Unsolved Homicides in Baltimore, MD
 

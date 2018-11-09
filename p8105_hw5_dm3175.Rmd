@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 # Homework 5
 
 ## Problem 1
-This problem investigates observation data from a longitudinal study with a control and experimental arm. 
+This problem investigates observational data from a longitudinal study with a control and experimental arm. 
 
 ### Load and Clean Data
 
